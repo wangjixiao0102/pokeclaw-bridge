@@ -1,0 +1,53 @@
+name: Build PokeClaw with API Bridge
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this repo (has patches)
+        uses: actions/checkout@v4
+
+      - name: Clone PokeClaw
+        run: |
+          git clone --depth 1 https://github.com/agents-io/PokeClaw.git /tmp/pokeclaw
+          echo "PokeClaw cloned OK"
+
+      - name: Apply patches
+        working-directory: /tmp/pokeclaw
+        run: |
+          git config --global --add safe.directory /tmp/pokeclaw
+          git apply --check $GITHUB_WORKSPACE/pokeclaw_bridge_patch.patch
+          git apply $GITHUB_WORKSPACE/pokeclaw_bridge_patch.patch
+          git apply --check $GITHUB_WORKSPACE/pokeclaw_entrypoint_patch.patch
+          git apply $GITHUB_WORKSPACE/pokeclaw_entrypoint_patch.patch
+          echo "Patches applied OK"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build Debug APK
+        working-directory: /tmp/pokeclaw
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          echo "Build done"
+          ls -lh app/build/outputs/apk/debug/
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PokeClaw-Bridge-APK
+          path: /tmp/pokeclaw/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30

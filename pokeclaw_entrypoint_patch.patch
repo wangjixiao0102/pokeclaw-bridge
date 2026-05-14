@@ -1,0 +1,42 @@
+--- a/app/src/main/java/io/agents/pokeclaw/automation/ExternalAutomationEntrypoint.kt
++++ b/app/src/main/java/io/agents/pokeclaw/automation/ExternalAutomationEntrypoint.kt
+@@ -24,6 +24,72 @@
+         return true
+     }
+ 
++    /**
++     * Execute a task directly (no Intent needed). Used by ConfigServer /api/task.
++     * Mirrors handle() but takes text and mode as direct parameters.
++     */
++    fun executeDirect(context: Context, text: String, mode: String): Boolean {
++        if (!KVUtils.isExternalAutomationEnabled()) {
++            XLog.w(TAG, "External automation rejected: disabled")
++            return false
++        }
++
++        if (appViewModel.isTaskRunning()) {
++            XLog.w(TAG, "External automation rejected: task already running")
++            return false
++        }
++
++        val actualMode = when (mode.lowercase()) {
++            "chat" -> ExternalAutomationContract.Mode.CHAT
++            else -> ExternalAutomationContract.Mode.TASK
++        }
++
++        XLog.i(TAG, "Execute direct ${actualMode}: ${text.take(MAX_LOG_TEXT)}")
++
++        val launch = Intent(context, ComposeChatActivity::class.java).apply {
++            when (actualMode) {
++                ExternalAutomationContract.Mode.TASK -> putExtra(EXTRA_TASK, text)
++                ExternalAutomationContract.Mode.CHAT -> putExtra(EXTRA_CHAT, text)
++            }
++            flags = Intent.FLAG_ACTIVITY_NEW_TASK
++        }
++        context.startActivity(launch)
++        return true
++    }
++
+     private fun rejectFromIntent(context: Context, intent: Intent, reason: String) {
+         XLog.w(TAG, "$reason: ${intent.action}")
+     }
