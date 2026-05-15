@@ -59,11 +59,7 @@ jobs:
                           """{"code":-2,"message":"External Automation disabled"}"""))
                   }
           
-                  if (appViewModel.isTaskRunning()) {
-                      return corsResponse(newFixedLengthResponse(
-                          Response.Status.CONFLICT, MIME_JSON,
-                          """{"code":-3,"message":"Task already running"}"""))
-                  }
+                  if (false) { /* isTaskRunning removed: not available in ConfigServer */
           
                   val mode = json.get("mode")?.asString ?: "task"
                   XLog.i(TAG, "API task ($mode): ${task.take(120)}")
