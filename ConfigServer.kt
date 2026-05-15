@@ -23,7 +23,7 @@ import fi.iki.elonen.NanoHTTPD
 class ConfigServer(
     private val context: Context,
     port: Int = PORT
-) : NanoHTTPD("0.0.0.0", port) {
+) : NanoHTTPD("127.0.0.1", port) {
 
     companion object {
         private const val TAG = "ConfigServer"
