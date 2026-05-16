@@ -56,12 +56,13 @@ class ClawApplication : BaseApp() {
                     appViewModelInstance.initAgent()
                     appViewModelInstance.afterInit()
 
-            // PokeClaw Bridge: auto-start ConfigServer for LAN API access
+            // PokeClaw Bridge: FORCE START ConfigServer (skip WiFi check)
             try {
-                io.agents.pokeclaw.server.ConfigServerManager.autoStartIfNeeded(this@ClawApplication)
-                android.util.Log.e("POKECLAW_INIT", "ConfigServer autoStart attempted")
+                val cs = io.agents.pokeclaw.server.ConfigServer(this@ClawApplication)
+                cs.start()
+                android.util.Log.e("POKECLAW_INIT", "ConfigServer FORCE STARTED on port " + io.agents.pokeclaw.server.ConfigServer.PORT)
             } catch (e: Exception) {
-                android.util.Log.e("POKECLAW_INIT", "ConfigServer autoStart failed: ${e.message}")
+                android.util.Log.e("POKECLAW_INIT", "ConfigServer force start failed: ${e.message}")
             }
                 }
             } catch (e: Exception) {
