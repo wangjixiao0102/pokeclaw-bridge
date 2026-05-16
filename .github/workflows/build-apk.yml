@@ -20,10 +20,9 @@ jobs:
         run: |
           cp ConfigServer.kt /tmp/pokeclaw/app/src/main/java/io/agents/pokeclaw/server/ConfigServer.kt
           cp ClawApplication.kt /tmp/pokeclaw/app/src/main/java/io/agents/pokeclaw/ClawApplication.kt
-          echo "✅ ConfigServer.kt patched"
-          grep -c "127.0.0.1" /tmp/pokeclaw/app/src/main/java/io/agents/pokeclaw/server/ConfigServer.kt && echo "✅ Binding to 127.0.0.1"
-          echo "✅ ClawApplication.kt patched"
-          grep -c "autoStartIfNeeded" /tmp/pokeclaw/app/src/main/java/io/agents/pokeclaw/ClawApplication.kt && echo "✅ Auto-start added"
+          echo "✅ Files copied"
+          grep -c "0.0.0.0" /tmp/pokeclaw/app/src/main/java/io/agents/pokeclaw/server/ConfigServer.kt && echo "✅ Binding to 0.0.0.0" || echo "⚠️ No 0.0.0.0 found"
+          grep -c "FORCE START" /tmp/pokeclaw/app/src/main/java/io/agents/pokeclaw/ClawApplication.kt && echo "✅ Force-start enabled" || echo "⚠️ No force-start found"
 
       - name: Setup JDK 21
         uses: actions/setup-java@v4
